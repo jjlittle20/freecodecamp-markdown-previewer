@@ -1,23 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { marked } from "marked";
+import * as DOMPurify from "dompurify";
+import "./App.css";
 
 function App() {
+  const defaultMarkdownText = `\
+  # H1:
+  ## H2
+  [link](https://www.freecodecamp.org).
+  <dl>
+    <dt>list</dt>
+    <dd>item1.</dd>
+    <dt>list2</dt>
+    <dd>**bold**.</dd>
+  </dl>
+  \`inline code\`
+  \`\`\`
+  function exampleOf() {
+    return multiLineCodeBlock;
+  }
+  \`\`\`
+  - list
+  - items
+  > block quote
+  ![freecodecamp](https://upload.wikimedia.org/wikipedia/commons/3/39/FreeCodeCamp_logo.png)`;
+
+  const [textAreaContents, setTextAreaContents] = useState(defaultMarkdownText);
+  const handleOnChange = (e) => {
+    setTextAreaContents(e?.target?.value);
+  };
+
+  marked.setOptions({
+    breaks: true,
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <textarea
+        value={textAreaContents}
+        id="editor"
+        onChange={(e) => handleOnChange(e)}
+      ></textarea>
+      <div
+        id="preview"
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(marked.parse(textAreaContents)),
+        }}
+      />
     </div>
   );
 }
